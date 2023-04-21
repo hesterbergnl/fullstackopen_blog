@@ -24,17 +24,21 @@ const mostBlogs = (blogs) => {
   var authors = []
 
   blogs.forEach(blog => {
-    var object = authors.find(author => author.name === blog.author)
-    logger.info(object)
-    if (object !== undefined) {
-      object.blogs += 1
+    var index = authors.map((e) => e.author).indexOf(blog.author)
+    
+    if (index !== -1) {
+      authors[index].blogs = authors[index].blogs + 1
     }
-    else {
+    else if (index === -1) {
       authors.push({
         "author":blog.author,
         "blogs":1
       })
     }
+    
+    logger.info('blog author type: ', typeof blog.author)
+    logger.info('authors author type: ', typeof authors[0].author)
+    logger.info(authors)
   })
 
   const reducer = (prev, current) => {
@@ -44,9 +48,36 @@ const mostBlogs = (blogs) => {
   return authors.length === 0 ? 0 : authors.reduce(reducer)
 }
 
+const mostLikes = (blogs) => {
+  var authors = []
+
+  blogs.forEach(blog => {
+    var index = authors.map((e) => e.author).indexOf(blog.author)
+    
+    if (index !== -1) {
+      authors[index].likes = authors[index].likes + blog.likes
+    }
+    else if (index === -1) {
+      authors.push({
+        "author":blog.author,
+        "likes":blog.likes
+      })
+    }
+    
+    logger.info(authors)
+  })
+
+  const reducer = (prev, current) => {
+    return (prev.likes > current.likes) ? prev : current
+  }
+
+  return authors.length === 0 ? 0 : authors.reduce(reducer)
+}
+
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
-  mostBlogs
+  mostBlogs,
+  mostLikes
 }

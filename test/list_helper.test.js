@@ -154,6 +154,16 @@ describe('most blog posts by author', () => {
       __v: 0
     }
 
+  const threeAuthors = {
+    author: 'Edsger W. Dijkstra',
+    blogs: 2
+  }
+
+  const oneAuthor = {
+    author: 'Edsger W. Dijkstra',
+    blogs: 1
+  }
+
   const listWithOneBlog = [
     blog1
   ]
@@ -168,16 +178,85 @@ describe('most blog posts by author', () => {
 
   test('when list has only one blog, most posts is Edsger!', () => {
     const result = listHelper.mostBlogs(listWithOneBlog)
-    expect(result).toEqual(blog1)
+    expect(result).toEqual(oneAuthor)
   })
 
   test('three blogs, Edsger wins', () => {
     const result = listHelper.mostBlogs(listWithThreeBlogs)
-    expect(result).toEqual(blog3)
+    expect(result).toEqual(threeAuthors)
   })
 
   test('empty list, null', () => {
     const result = listHelper.mostBlogs(listEmpty)
-    expect(result).toEqual(null)
+    expect(result).toBe(0)
+  })
+})
+
+describe('liked author', () => {
+  const blog1 =
+    {
+      _id: '5a422aa71b54a676234d17f8',
+      title: 'Go To Statement Considered Harmful',
+      author: 'Edsger W. Dijkstra',
+      url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+      likes: 5,
+      __v: 0
+    }
+
+  const blog2 =
+    {
+      _id: '5a422aa71b54a676234d17ff',
+      title: 'Go To Statement Considered Harmful 2',
+      author: 'Nikolai',
+      url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+      likes: 1,
+      __v: 0
+    }
+
+  const blog3 =
+    {
+      _id: '5a422aa71b54a676234d17fa',
+      title: 'Go To Statement Considered Harmful 3',
+      author: 'Edsger W. Dijkstra',
+      url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+      likes: 7,
+      __v: 0
+    }
+
+  const threeAuthors = {
+    author: 'Edsger W. Dijkstra',
+    likes: 12
+  }
+
+  const oneAuthor = {
+    author: 'Edsger W. Dijkstra',
+    likes: 5
+  }
+
+  const listWithOneBlog = [
+    blog1
+  ]
+
+  const listWithThreeBlogs = [
+    blog1,
+    blog2,
+    blog3
+  ]
+
+  const listEmpty = []
+
+  test('when list has only one blog, most posts is Edsger!', () => {
+    const result = listHelper.mostLikes(listWithOneBlog)
+    expect(result).toEqual(oneAuthor)
+  })
+
+  test('three blogs, Edsger wins', () => {
+    const result = listHelper.mostLikes(listWithThreeBlogs)
+    expect(result).toEqual(threeAuthors)
+  })
+
+  test('empty list, null', () => {
+    const result = listHelper.mostLikes(listEmpty)
+    expect(result).toBe(0)
   })
 })
