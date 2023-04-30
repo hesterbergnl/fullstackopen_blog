@@ -26,7 +26,7 @@ app.use(cors())
 app.use(express.json())
 
 app.use('/api/users', usersRouter)
-app.use('/api/posts', blogRouter)
+app.use('/api/blogs', blogRouter)
 app.use('/api/login', loginRouter)
 app.use(middleware.errorHandler)
 

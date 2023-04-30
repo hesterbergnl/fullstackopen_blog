@@ -53,7 +53,7 @@ beforeEach(async () => {
   for (let post of helper.initialPosts) {
     const res = await api
       await api
-      .post('/api/posts')
+      .post('/api/blogs')
       .send(post)
       .set({ Authorization: token })
   }
@@ -62,26 +62,26 @@ beforeEach(async () => {
 describe ('Verifying notes returned', () => {
   test('notes are returned as json', async () =>{
     await api
-      .get('/api/posts')
+      .get('/api/blogs')
       .expect(200)
       .expect('Content-Type', /application\/json/)
   })
 
   test('all notes are returned', async () => {
-    const response = await api.get('/api/posts')
+    const response = await api.get('/api/blogs')
 
     expect(response.body).toHaveLength(helper.initialPosts.length)
   })
 
   test('a specific note is returned', async () => {
-    const response = await api.get('/api/posts')
+    const response = await api.get('/api/blogs')
 
     const contents = response.body.map(r => r.title)
     expect(contents).toContain('First Post!')
   })
 
   test('property id exists', async () => {
-    const response = await api.get('/api/posts')
+    const response = await api.get('/api/blogs')
 
     expect(response.body[0].id).toBeDefined()
   })
@@ -90,12 +90,12 @@ describe ('Verifying notes returned', () => {
 describe ('Adding new notes', () => {
   test('add new note', async () => {
     await api
-      .post('/api/posts')
+      .post('/api/blogs')
       .send(newPost)
       .set({ Authorization: token })
       .expect(201)
 
-    const response = await api.get('/api/posts')
+    const response = await api.get('/api/blogs')
 
     const contents = response.body.map(r => r.title)
     expect(contents).toHaveLength(helper.initialPosts.length + 1)
@@ -104,7 +104,7 @@ describe ('Adding new notes', () => {
 
   test('add post with no likes', async () => {
     const res = await api
-      .post('/api/posts')
+      .post('/api/blogs')
       .send(newPostNoLikes)
       .set({ Authorization: token })
 
@@ -113,7 +113,7 @@ describe ('Adding new notes', () => {
 
   test('add post with no title', async () => {
     await api
-      .post('/api/posts')
+      .post('/api/blogs')
       .send(newPostNoTitle)
       .set({ Authorization: token })
       .expect(400)
@@ -122,7 +122,7 @@ describe ('Adding new notes', () => {
 
   test('add post with no url', async () => {
     await api
-      .post('/api/posts')
+      .post('/api/blogs')
       .send(newPostNoUrl)
       .set({ Authorization: token })
       .expect(400)
@@ -130,7 +130,7 @@ describe ('Adding new notes', () => {
 
   test('attempt post without authorization', async () => {
     await api
-      .post('/api/posts')
+      .post('/api/blogs')
       .send(newPost)
       .expect(401)
   })
@@ -138,15 +138,15 @@ describe ('Adding new notes', () => {
 
 describe ('Delete blog', () => {
   test('delete blog', async () => {
-    const startingBlogs = await api.get('/api/posts')
+    const startingBlogs = await api.get('/api/blogs')
     const blogToDelete = startingBlogs.body[0]
 
     await api
-      .delete(`/api/posts/${blogToDelete.id}`)
+      .delete(`/api/blogs/${blogToDelete.id}`)
       .set({ Authorization: token })
       .expect(204)
 
-    const endingBlogs = await api.get('/api/posts')
+    const endingBlogs = await api.get('/api/blogs')
 
     expect(endingBlogs.body).toHaveLength(helper.initialPosts.length - 1)
 
@@ -158,7 +158,7 @@ describe ('Delete blog', () => {
 
 describe ('Update blog', () => {
   test('update blog likes', async () => {
-    const startingBlogs = await api.get('/api/posts')
+    const startingBlogs = await api.get('/api/blogs')
     const blogToUpdate = startingBlogs.body[0]
 
     const updatedBlog = {
@@ -168,11 +168,11 @@ describe ('Update blog', () => {
     }
 
     await api
-      .put(`/api/posts/${blogToUpdate.id}`)
+      .put(`/api/blogs/${blogToUpdate.id}`)
       .send(updatedBlog)
       .set({ Authorization: token })
 
-    const endingBlogs = await api.get('/api/posts')
+    const endingBlogs = await api.get('/api/blogs')
 
     expect(endingBlogs.body).toHaveLength(helper.initialPosts.length)
 
