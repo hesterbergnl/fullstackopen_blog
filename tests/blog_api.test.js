@@ -4,40 +4,58 @@ const Blog = require('../models/blog')
 const helper = require('./test_helper')
 const logger = require('../utils/logger')
 const app = require('../app')
+const User = require('../models/user')
 
 const api = supertest(app)
 
 const newPost = {
   title: 'New Third post!',
-  author: 'Nikolai',
   url: 'http://testurl.com/3',
   likes: 5
 }
 
 const newPostNoLikes = {
   title: 'New Third post!',
-  author: 'Nikolai',
   url: 'http://testurl.com/4',
 }
 
 const newPostNoTitle = {
-  author: 'Nikolai',
   url: 'http://testurl.com/5',
   likes: 5
 }
 
 const newPostNoUrl = {
   title: 'No Url!!',
-  author: 'Nikolai',
   likes: 2
 }
 
+const newUser = {
+  username: 'testing',
+  password: '123'
+}
+
+var token = null
+
 beforeEach(async () => {
   await Blog.deleteMany({})
+  await User.deleteMany({})
+
+  const result = await api
+    .post('/api/users')
+    .send(newUser)
+
+  const res = await api
+    .post('/api/login')
+    .send(newUser)
+
+  token = `Bearer ${res.body.token}`
 
   for (let post of helper.initialPosts) {
-    let postObject = new Blog(post)
-    await postObject.save()
+    const res = await api
+      await api
+      .post('/api/posts')
+      .send(post)
+      .set({ Authorization: token })
   }
 })
 
@@ -71,8 +89,11 @@ describe ('Verifying notes returned', () => {
 
 describe ('Adding new notes', () => {
   test('add new note', async () => {
-    let newBlogObj = new Blog(newPost)
-    await newBlogObj.save()
+    await api
+      .post('/api/posts')
+      .send(newPost)
+      .set({ Authorization: token })
+      .expect(201)
 
     const response = await api.get('/api/posts')
 
@@ -82,17 +103,19 @@ describe ('Adding new notes', () => {
   })
 
   test('add post with no likes', async () => {
-    let newBlogObj = new Blog(newPostNoLikes)
-    const res = await newBlogObj.save()
+    const res = await api
+      .post('/api/posts')
+      .send(newPostNoLikes)
+      .set({ Authorization: token })
 
-    console.log(res)
-    expect(res.likes).toBe(0)
+    expect(res.body.likes).toBe(0)
   })
 
   test('add post with no title', async () => {
     await api
       .post('/api/posts')
       .send(newPostNoTitle)
+      .set({ Authorization: token })
       .expect(400)
 
   })
@@ -101,7 +124,15 @@ describe ('Adding new notes', () => {
     await api
       .post('/api/posts')
       .send(newPostNoUrl)
+      .set({ Authorization: token })
       .expect(400)
+  })
+
+  test('attempt post without authorization', async () => {
+    await api
+      .post('/api/posts')
+      .send(newPost)
+      .expect(401)
   })
 })
 
@@ -110,10 +141,9 @@ describe ('Delete blog', () => {
     const startingBlogs = await api.get('/api/posts')
     const blogToDelete = startingBlogs.body[0]
 
-    console.log(blogToDelete)
-
     await api
       .delete(`/api/posts/${blogToDelete.id}`)
+      .set({ Authorization: token })
       .expect(204)
 
     const endingBlogs = await api.get('/api/posts')
@@ -131,11 +161,8 @@ describe ('Update blog', () => {
     const startingBlogs = await api.get('/api/posts')
     const blogToUpdate = startingBlogs.body[0]
 
-    console.log(blogToUpdate)
-
     const updatedBlog = {
       title: blogToUpdate.title,
-      author: blogToUpdate.author,
       url: blogToUpdate.url,
       likes: 11
     }
@@ -143,6 +170,7 @@ describe ('Update blog', () => {
     await api
       .put(`/api/posts/${blogToUpdate.id}`)
       .send(updatedBlog)
+      .set({ Authorization: token })
 
     const endingBlogs = await api.get('/api/posts')
 
