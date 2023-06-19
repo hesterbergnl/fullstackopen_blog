@@ -41,7 +41,8 @@ blogRouter.put('/:id', async (request, response) => {
     title: body.title,
     author: body.author,
     url: body.url,
-    likes: body.likes
+    likes: body.likes,
+    user: body.user
   }
 
   const updatedBlog = await Blog.findByIdAndUpdate(
@@ -58,7 +59,10 @@ blogRouter.delete('/:id', middleware.userExtractor, async (request, response) =>
 
   const user = request.user
 
-  if (blog.id.toString() === user.id) {
+  console.log(user)
+  console.log(blog.user.toString())
+
+  if (blog.user.toString() === user.id) {
     await Blog.findByIdAndRemove(request.params.id)
     response.status(204).end()
   } else {
